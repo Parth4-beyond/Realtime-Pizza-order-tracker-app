@@ -12,7 +12,7 @@ const MongoDbStore = require('connect-mongo')(session)
 const passport = require('passport')
 
 // Database connection
-const url = 'mongodb://localhost/pizza';
+const url = process.env.DATABASE;
 mongoose.connect(url, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true, useFindAndModify: true });
 const connection = mongoose.connection;
 connection.once('open', () => {
