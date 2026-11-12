@@ -26,7 +26,7 @@ function authController() {
           req.flash("error", info.message);
           return res.redirect("/login");
         }
-        req.logIn(user, (err) => {
+        req.logIn(user, { keepSessionInfo: true }, (err) => {
           if (err) {
             req.flash("error", info.message);
             return next(err);
@@ -50,14 +50,13 @@ function authController() {
       }
 
       // Check if email exists
-      User.exists({ email: email }, (err, result) => {
-        if (result) {
-          req.flash("error", "Email already taken");
-          req.flash("name", name);
-          req.flash("email", email);
-          return res.redirect("/register");
-        }
-      });
+      const emailTaken = await User.exists({ email: email });
+      if (emailTaken) {
+        req.flash("error", "Email already taken");
+        req.flash("name", name);
+        req.flash("email", email);
+        return res.redirect("/register");
+      }
 
       // Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -79,9 +78,13 @@ function authController() {
           return res.redirect("/register");
         });
     },
-    logout(req, res) {
-      req.logout();
-      return res.redirect("/login");
+    logout(req, res, next) {
+      req.logout((err) => {
+        if (err) {
+          return next(err);
+        }
+        return res.redirect("/login");
+      });
     },
   };
 }

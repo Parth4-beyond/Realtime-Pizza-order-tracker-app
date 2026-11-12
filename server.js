@@ -8,30 +8,23 @@ const PORT = process.env.PORT || 3000;
 const mongoose = require("mongoose");
 const session = require("express-session");
 const flash = require("express-flash");
-const MongoDbStore = require("connect-mongo")(session);
+const MongoDbStore = require("connect-mongo");
 const passport = require("passport");
 const Emitter = require("events");
 
 // Database connection
-mongoose.connect(process.env.DATABASE, {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useUnifiedTopology: true,
-  useFindAndModify: true,
+mongoose.connect(process.env.DATABASE).catch((err) => {
+  console.log("Connection failed...");
 });
 const connection = mongoose.connection;
-connection
-  .once("open", () => {
-    console.log("Database connected...");
-  })
-  .catch((err) => {
-    console.log("Connection failed...");
-  });
+connection.once("open", () => {
+  console.log("Database connected...");
+});
 
 // Session store
-let mongoStore = new MongoDbStore({
-  mongooseConnection: connection,
-  collection: "sessions",
+let mongoStore = MongoDbStore.create({
+  client: connection.getClient(),
+  collectionName: "sessions",
 });
 
 // Event emitter
