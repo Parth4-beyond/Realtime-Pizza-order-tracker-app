@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 const mongoose = require("mongoose");
 const session = require("express-session");
 const flash = require("express-flash");
-const MongoDbStore = require("connect-mongo")(session);
+const MongoDbStore = require("connect-mongo");
 const passport = require("passport");
 const Emitter = require("events");
 
@@ -22,9 +22,9 @@ connection.once("open", () => {
 });
 
 // Session store
-let mongoStore = new MongoDbStore({
-  mongooseConnection: connection,
-  collection: "sessions",
+let mongoStore = MongoDbStore.create({
+  client: connection.getClient(),
+  collectionName: "sessions",
 });
 
 // Event emitter
