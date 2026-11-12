@@ -13,20 +13,13 @@ const passport = require("passport");
 const Emitter = require("events");
 
 // Database connection
-mongoose.connect(process.env.DATABASE, {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useUnifiedTopology: true,
-  useFindAndModify: true,
+mongoose.connect(process.env.DATABASE).catch((err) => {
+  console.log("Connection failed...");
 });
 const connection = mongoose.connection;
-connection
-  .once("open", () => {
-    console.log("Database connected...");
-  })
-  .catch((err) => {
-    console.log("Connection failed...");
-  });
+connection.once("open", () => {
+  console.log("Database connected...");
+});
 
 // Session store
 let mongoStore = new MongoDbStore({
